@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
-      - run: echo "REFRESH_TOKEN=$(ruby index.rb)" >> "$GITHUB_ENV"
+      - run: ruby index.rb >> "$GITHUB_ENV"
       - run: npm install libsodium-wrappers
       - uses: actions/github-script@v7
         with:

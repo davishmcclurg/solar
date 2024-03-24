@@ -84,4 +84,4 @@ File.write('index.html', <<~HTML)
   </html>
 HTML
 
-$stdout.puts(refresh_token)
+$stdout.puts("REFRESH_TOKEN=#{refresh_token}")
