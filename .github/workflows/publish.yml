@@ -8,6 +8,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      secrets: read
     env:
       TZ: America/Los_Angeles
       KEY: ${{ secrets.KEY }}
