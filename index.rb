@@ -76,10 +76,18 @@ File.write('index.html', <<~HTML)
   <!doctype html>
   <html>
   <head>
-    <title>Solar</title>
+    <title>solar</title>
   </head>
   <body>
-    <h1>#{(projected_total / 1_000).round} kWh</h1>
+    <h1>solar</h1>
+    <dl>
+      <dt>today</dt>
+      <dd>#{(energy_today.to_f / 1_000).round(1)} kwh</dd>
+      <dt>month average</dt>
+      <dd>#{(average_watt_hours.to_f / 1_000).round(1)} kwh</dd>
+      <dt>month projection</dt>
+      <dd>#{(projected_total / 1_000).round} kwh</dd>
+    </dl>
   </body>
   </html>
 HTML
