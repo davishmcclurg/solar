@@ -17,9 +17,18 @@ jobs:
       SYSTEM_ID: ${{ secrets.SYSTEM_ID }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: public
+          fetch-depth: 0
       - uses: ruby/setup-ruby@v1
-      - run: ruby index.rb >> "$GITHUB_ENV"
-      - run: cat index.html
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git merge origin/main
+          ruby index.rb >> "$GITHUB_ENV"
+          git add index.html
+          git commit -m "$(date)" || echo "no changes"
+          git push
       - run: npm install libsodium-wrappers
       - uses: actions/github-script@v7
         with:
