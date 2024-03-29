@@ -68,9 +68,10 @@ end.group_by do |date, _watt_hours|
   [date.year, date.month]
 end.max_by(&:first)
 
-average_watt_hours = month_production.sum(&:last).to_f / month_production.size
+month_total = month_production.sum(&:last)
+average_watt_hours = month_total.to_f / month_production.size
 month_days = Date.new(year, month).next_month.prev_day.day
-projected_total = average_watt_hours * month_days
+projected_month_total = average_watt_hours * month_days
 
 File.write('index.html', <<~HTML)
   <!doctype html>
@@ -83,10 +84,12 @@ File.write('index.html', <<~HTML)
     <dl>
       <dt>today</dt>
       <dd>#{(energy_today.to_f / 1_000).round(1)} kwh</dd>
+      <dt>month</dt>
+      <dd>#{month_total / 1_000} kwh</dd>
       <dt>month average</dt>
       <dd>#{(average_watt_hours.to_f / 1_000).round(1)} kwh</dd>
       <dt>month projection</dt>
-      <dd>#{(projected_total / 1_000).round} kwh</dd>
+      <dd>#{(projected_month_total / 1_000).round} kwh</dd>
     </dl>
   </body>
   </html>
