@@ -72,6 +72,7 @@ month_total = month_production.sum(&:last)
 average_watt_hours = month_total.to_f / month_production.size
 month_days = Date.new(year, month).next_month.prev_day.day
 projected_month_total = average_watt_hours * month_days
+pvwatts = [446, 601, 918, 1_183, 1_338, 1_359, 1_317, 1_143, 969, 745, 483, 404]
 
 File.write('index.html', <<~HTML)
   <!doctype html>
@@ -90,6 +91,8 @@ File.write('index.html', <<~HTML)
       <dd>#{(average_watt_hours.to_f / 1_000).round(1)} kwh</dd>
       <dt>month projection</dt>
       <dd>#{(projected_month_total / 1_000).round} kwh</dd>
+      <dt>pvatts projection</dt>
+      <dd>#{pvwatts[month - 1]} kwh</dd>
     </dl>
   </body>
   </html>
