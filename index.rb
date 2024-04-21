@@ -72,7 +72,7 @@ month_total = month_production.sum(&:last)
 average_watt_hours = month_total.to_f / month_production.size
 month_days = Date.new(year, month).next_month.prev_day.day
 projected_month_total = average_watt_hours * month_days
-pvwatts = [446, 601, 918, 1_183, 1_338, 1_359, 1_317, 1_143, 969, 745, 483, 404]
+pvwatts = [451, 607, 928, 1_195, 1_352, 1_373, 1_330, 1_155, 979, 753, 488, 408]
 pvwatts_projection = pvwatts[month - 1]
 pvwatts_average = pvwatts_projection.to_f / month_days
 
