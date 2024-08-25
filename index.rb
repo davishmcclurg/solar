@@ -62,19 +62,31 @@ start_date, production = JSON.parse(response).fetch_values('start_date', 'produc
 start_date = Date.parse(start_date)
 production << energy_today
 
-(year, month), month_production = production.map.with_index do |watt_hours, index|
-  [start_date + index, watt_hours]
-end.group_by do |date, _watt_hours|
-  [date.year, date.month]
+year, year_production = production.each_with_index.with_object({}) do |(watt_hours, index), out|
+  date = start_date + index
+  out[date.year] ||= {}
+  out[date.year][date.month] ||= []
+  out[date.year][date.month] << watt_hours
 end.max_by(&:first)
 
-month_total = month_production.sum(&:last)
-average_watt_hours = month_total.to_f / month_production.size
-month_days = Date.new(year, month).next_month.prev_day.day
-projected_month_total = average_watt_hours * month_days
+month, month_production = year_production.max_by(&:first)
+
+month_date = Date.new(year, month)
 pvwatts = [451, 607, 928, 1_195, 1_352, 1_373, 1_330, 1_155, 979, 753, 488, 408]
-pvwatts_projection = pvwatts[month - 1]
-pvwatts_average = pvwatts_projection.to_f / month_days
+
+month_total = month_production.sum
+month_average_watt_hours = month_total.to_f / month_production.size
+month_days = month_date.next_month.prev_day.day
+projected_month_total = month_average_watt_hours * month_days
+pvwatts_month_projection = pvwatts[month - 1]
+pvwatts_month_average = pvwatts_month_projection.to_f / month_days
+
+year_total = year_production.each_value.sum(&:sum)
+year_average_watt_hours = year_total.to_f / year_production.each_value.sum(&:size)
+year_days = month_date.leap? ? 366 : 365
+projected_year_total = year_average_watt_hours * year_days
+pvwatts_year_projection = pvwatts.sum
+pvwatts_year_average = pvwatts_year_projection.to_f / year_days
 
 File.write('index.html', <<~HTML)
   <!doctype html>
@@ -87,16 +99,28 @@ File.write('index.html', <<~HTML)
     <dl>
       <dt>today</dt>
       <dd>#{(energy_today.to_f / 1_000).round(1)} kwh</dd>
+
       <dt>month</dt>
       <dd>#{month_total / 1_000} kwh</dd>
       <dt>month average</dt>
-      <dd>#{(average_watt_hours.to_f / 1_000).round(1)} kwh</dd>
+      <dd>#{(month_average_watt_hours.to_f / 1_000).round(1)} kwh</dd>
       <dt>month projection</dt>
       <dd>#{(projected_month_total / 1_000).round} kwh</dd>
-      <dt>pvwatts average</dt>
-      <dd>#{pvwatts_average.round(1)} kwh</dd>
-      <dt>pvwatts projection</dt>
-      <dd>#{pvwatts_projection} kwh</dd>
+      <dt>pvwatts month average</dt>
+      <dd>#{pvwatts_month_average.round(1)} kwh</dd>
+      <dt>pvwatts month projection</dt>
+      <dd>#{pvwatts_month_projection} kwh</dd>
+
+      <dt>year</dt>
+      <dd>#{year_total / 1_000} kwh</dd>
+      <dt>year average</dt>
+      <dd>#{(year_average_watt_hours.to_f / 1_000).round(1)} kwh</dd>
+      <dt>year projection</dt>
+      <dd>#{(projected_year_total / 1_000).round} kwh</dd>
+      <dt>pvwatts year average</dt>
+      <dd>#{pvwatts_year_average.round(1)} kwh</dd>
+      <dt>pvwatts year projection</dt>
+      <dd>#{pvwatts_year_projection} kwh</dd>
     </dl>
   </body>
   </html>
