@@ -7,7 +7,7 @@ gemfile do
   gem 'date'
   gem 'json'
   gem 'net-http'
-  gem 'uri'
+  gem 'uri', '0.13.0'
   gem 'webrick'
 end
 
